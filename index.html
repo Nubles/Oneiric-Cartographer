@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oneiric Cartographer — Subconscious Archipelago</title>
+  <!-- Google Fonts for Premium Look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Deep Ocean Viewport Canvas -->
+  <div id="canvas-container">
+    <canvas id="ocean-canvas"></canvas>
+  </div>
+
+  <!-- Ambient Sky / Fog Overlay for Atmospheric Lighting -->
+  <div id="atmosphere-overlay"></div>
+
+  <!-- Sidebar: Journal & Island Creator -->
+  <aside id="sidebar" class="glass-panel">
+    <header class="sidebar-header">
+      <h1>Oneiric Cartographer</h1>
+      <p class="subtitle">Subconscious Archipelago Map</p>
+    </header>
+
+    <main class="sidebar-content">
+      <!-- Create New Island Form -->
+      <section id="island-form-section">
+        <h2>Log a New State / Dream</h2>
+        <form id="island-form">
+          <div class="form-group">
+            <label for="dream-title">Dream / State Name</label>
+            <input type="text" id="dream-title" placeholder="e.g., Flying over neon spires..." required autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="dream-notes">Journal Notes (Optional)</label>
+            <textarea id="dream-notes" placeholder="What memories or feelings linger?" rows="3"></textarea>
+          </div>
+
+          <!-- Dimension Sliders -->
+          <div class="sliders-container">
+            <div class="slider-group" data-tooltip="Determines coastline clarity. High Lucidity creates sharp, precise peaks. Low Lucidity creates foggy, bleeding, dreamlike coastlines.">
+              <div class="slider-label">
+                <span>Lucidity</span>
+                <span id="val-lucidity" class="slider-val">50%</span>
+              </div>
+              <input type="range" id="slider-lucidity" min="0" max="100" value="50">
+            </div>
+
+            <div class="slider-group" data-tooltip="Determines peak multiplicity and coastline complexity. High Chaos causes jagged peaks and islets.">
+              <div class="slider-label">
+                <span>Chaos</span>
+                <span id="val-chaos" class="slider-val">50%</span>
+              </div>
+              <input type="range" id="slider-chaos" min="0" max="100" value="50">
+            </div>
+
+            <div class="slider-group" data-tooltip="Determines the color profile. High Warmth yields solar/desert gold and coral. Low Warmth yields abyssal/icy blue and indigo.">
+              <div class="slider-label">
+                <span>Warmth</span>
+                <span id="val-warmth" class="slider-val">50%</span>
+              </div>
+              <input type="range" id="slider-warmth" min="0" max="100" value="50">
+            </div>
+
+            <div class="slider-group" data-tooltip="Determines steepness and contour density. High Gravity yields steep volcanic ridges; low Gravity yields low-lying flat atolls.">
+              <div class="slider-label">
+                <span>Gravity</span>
+                <span id="val-gravity" class="slider-val">50%</span>
+              </div>
+              <input type="range" id="slider-gravity" min="0" max="100" value="50">
+            </div>
+
+            <div class="slider-group" data-tooltip="Determines spatial distortion. High Vertigo twists the terrain contours into swirling patterns.">
+              <div class="slider-label">
+                <span>Vertigo</span>
+                <span id="val-vertigo" class="slider-val">50%</span>
+              </div>
+              <input type="range" id="slider-vertigo" min="0" max="100" value="50">
+            </div>
+          </div>
+
+          <button type="submit" id="btn-create" class="action-btn">Materialize Island</button>
+        </form>
+      </section>
+    </main>
+
+    <footer class="sidebar-footer">
+      <p>Click & Drag to pan • Scroll to zoom</p>
+      <p>Double-click empty ocean to summon quick islands</p>
+    </footer>
+  </aside>
+
+  <!-- Interactive HUD overlay -->
+  <div id="hud" class="glass-panel">
+    <div class="hud-item clock-container">
+      <span class="hud-label">Subconscious Time</span>
+      <span id="hud-clock">00:00:00</span>
+    </div>
+    <div class="hud-item cycle-controller">
+      <span class="hud-label">Time of Day Cycle</span>
+      <select id="time-cycle-select">
+        <option value="realtime">Follow System Time</option>
+        <option value="dawn">Dawn</option>
+        <option value="day">Day</option>
+        <option value="dusk">Dusk</option>
+        <option value="night">Night</option>
+      </select>
+    </div>
+    <div class="hud-item stats-container">
+      <span class="hud-label">Archipelago Islands</span>
+      <span id="hud-count">0</span>
+    </div>
+    <div class="hud-item actions-container">
+      <button id="btn-reset" class="hud-btn" title="Clear Archipelago">Clear</button>
+      <button id="btn-export" class="hud-btn" title="Export Map Data">Export</button>
+      <button id="btn-import" class="hud-btn" title="Import Map Data">Import</button>
+      <input type="file" id="import-file" style="display:none;" accept=".json">
+    </div>
+  </div>
+
+  <!-- Island Detail Modal -->
+  <div id="detail-modal" class="modal-backdrop hidden">
+    <div class="modal-content glass-panel">
+      <button id="modal-close" class="close-btn">&times;</button>
+      <div id="modal-island-render" class="modal-render-container">
+        <!-- Render preview of selected island -->
+        <canvas id="modal-preview-canvas"></canvas>
+      </div>
+      <div class="modal-info">
+        <h3 id="modal-title">Island Name</h3>
+        <p id="modal-date" class="modal-date">Logged on June 25, 2026</p>
+        <div id="modal-dimensions" class="modal-dimensions-grid">
+          <!-- Populated by JS -->
+        </div>
+        <p id="modal-notes" class="modal-notes">Journal details go here...</p>
+        <div class="modal-actions">
+          <button id="btn-delete-island" class="danger-btn">Dematerialize Island</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Embedded scripts -->
+  <script src="island-generator.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
