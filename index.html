@@ -87,6 +87,17 @@
           <button type="submit" id="btn-create" class="action-btn">Materialize Island</button>
         </form>
       </section>
+
+      <!-- Explorer List Section -->
+      <section id="explorer-section">
+        <h2>Archipelago Explorer</h2>
+        <div class="search-box">
+          <input type="text" id="explorer-search" placeholder="Search dream logs..." autocomplete="off">
+        </div>
+        <div id="explorer-list" class="explorer-list">
+          <!-- Filled dynamically by JS -->
+        </div>
+      </section>
     </main>
 
     <footer class="sidebar-footer">
@@ -115,12 +126,22 @@
       <span class="hud-label">Archipelago Islands</span>
       <span id="hud-count">0</span>
     </div>
+    <div class="hud-item audio-container">
+      <span class="hud-label">Ambient Audio</span>
+      <button id="btn-audio" class="hud-btn audio-btn" title="Toggle Soundscape">🔇 Soundscape Off</button>
+    </div>
     <div class="hud-item actions-container">
       <button id="btn-reset" class="hud-btn" title="Clear Archipelago">Clear</button>
       <button id="btn-export" class="hud-btn" title="Export Map Data">Export</button>
       <button id="btn-import" class="hud-btn" title="Import Map Data">Import</button>
       <input type="file" id="import-file" style="display:none;" accept=".json">
     </div>
+  </div>
+
+  <!-- Linking HUD Instruction (hidden by default) -->
+  <div id="linking-hud" class="glass-panel hidden">
+    <span>Linking: Select another island to connect constellation lines...</span>
+    <button id="btn-cancel-link" class="hud-btn">Cancel</button>
   </div>
 
   <!-- Island Detail Modal -->
@@ -139,6 +160,7 @@
         </div>
         <p id="modal-notes" class="modal-notes">Journal details go here...</p>
         <div class="modal-actions">
+          <button id="btn-link-mode" class="hud-btn">Connect Constellation</button>
           <button id="btn-delete-island" class="danger-btn">Dematerialize Island</button>
         </div>
       </div>

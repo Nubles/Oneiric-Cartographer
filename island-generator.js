@@ -248,6 +248,99 @@
           ctx.stroke();
         }
       }
+      
+      // Draw procedural landmarks (trees / crystals) inside the island
+      let seed = this.seedX + this.seedY;
+      function seededRandom() {
+        let x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+      }
+
+      const landmarkCount = 10 + Math.floor((this.gravity / 10));
+      for (let i = 0; i < landmarkCount; i++) {
+        const angle = seededRandom() * Math.PI * 2;
+        const dist = seededRandom() * radius * 0.75;
+        const tx = dist * Math.cos(angle);
+        const ty = dist * Math.sin(angle);
+        const elev = this.getElevation(tx, ty);
+
+        if (elev > 0.15 && elev < 0.6) {
+          ctx.save();
+          ctx.translate(tx * scale, ty * scale);
+          if (this.warmth > 40) {
+            // Draw trees
+            const height = (4 + seededRandom() * 6) * scale;
+            ctx.fillStyle = rgbString(palette.grass, 0.7);
+            ctx.beginPath();
+            ctx.arc(0, -height, 2.5 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = rgbString(palette.rock, 0.45);
+            ctx.lineWidth = 0.6 * scale;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -height);
+            ctx.stroke();
+          } else {
+            // Draw crystals
+            const cHeight = (5 + seededRandom() * 7) * scale;
+            const cWidth = (1.5 + seededRandom() * 2) * scale;
+            ctx.fillStyle = rgbString(palette.peak, 0.7);
+            ctx.strokeStyle = rgbString(palette.shallows, 0.8);
+            ctx.lineWidth = 0.5 * scale;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-cWidth, -cHeight * 0.7);
+            ctx.lineTo(0, -cHeight);
+            ctx.lineTo(cWidth, -cHeight * 0.7);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+      }
+
+      // Draw peak Beacon Tower for high lucidity islands
+      if (this.lucidity > 65) {
+        ctx.save();
+        const tHeight = 16 * scale;
+        
+        // Draw frame
+        ctx.strokeStyle = rgbString(palette.rock, 0.85);
+        ctx.lineWidth = 1 * scale;
+        ctx.beginPath();
+        ctx.moveTo(-4 * scale, 0);
+        ctx.lineTo(-2 * scale, -tHeight);
+        ctx.lineTo(2 * scale, -tHeight);
+        ctx.lineTo(4 * scale, 0);
+        ctx.stroke();
+
+        // Draw light source
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(0, -tHeight, 2.5 * scale, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Spotlight projection beam (if in viewport/map view)
+        if (showDetails) {
+          const timeAngle = (Date.now() / 1500) % (Math.PI * 2);
+          const beamAngle = timeAngle + (this.seedX % (Math.PI * 2));
+          const beamWidth = 0.25;
+
+          const gradient = ctx.createRadialGradient(0, -tHeight, 0, 0, -tHeight, 140 * scale);
+          gradient.addColorStop(0, "rgba(255, 255, 255, 0.65)");
+          gradient.addColorStop(0.2, rgbString(palette.peak, 0.25));
+          gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.moveTo(0, -tHeight);
+          ctx.arc(0, -tHeight, 140 * scale, beamAngle - beamWidth, beamAngle + beamWidth);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+      }
 
       // Draw island label/marker if details are enabled
       if (showDetails) {
